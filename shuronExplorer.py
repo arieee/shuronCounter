@@ -4,16 +4,17 @@ import sys,os
 import math,re,datetime
 #import MeCab
 
+# name, basepath, list of texfiles
 files = [
-    ("ysuzuki","ysuzuki/suzukiMasterThesis.tex"),
-    ("naohiro_ito","naohiro_ito/thesis.tex"),
-    ("y_maki","y_maki/sample.tex"),
-    ("shimisho","shimisho/sample.tex"),
-    ("tsan","senpai/tsuchiyaALL.tex"),
-    ("nsan","senpai/nishinaALL.tex"),
-    ("ssan","senpai/suzukiALL.tex"),
-    ("ksan","senpai/kuriharaALL.tex"),
-    ("osan","senpai/okamotoALL.tex")
+    ("ysuzuki","ysuzuki",["ysuzuki01.tex","ysuzuki02.tex","ysuzuki03.tex","ysuzuki04.tex","ysuzuki05.tex","ysuzuki_thesis.tex"]),
+    ("naohiro_ito","naohiro_ito",["chapintro.tex","chapssd.tex","chaprelwork.tex","chapjoin.tex","chapmultiquery.tex","thesis.tex"]),
+    ("y_maki","y_maki",["maki_01.tex","maki_02.tex","maki_03.tex","maki_04.tex","maki_05.tex","maki_06.tex","maki_07.tex","maki_thesis.tex"]),
+    ("shimisho","shimisho",["sample.tex"]),
+    ("tsan","senpai",["tsuchiyaALL.tex"]),
+    ("nsan","senpai",["nishinaALL.tex"]),
+    ("ssan","senpai",["suzukiALL.tex"]),
+    ("ksan","senpai",["kuriharaALL.tex"]),
+    ("osan","senpai",["okamotoALL.tex"])
          ]
 
 #m = MeCab.Tagger()
@@ -23,24 +24,34 @@ sys.stderr.write("datetime" + "\t" + "\t".join([fi[0] for fi in files]) + "\n")
 #print "datetime" + "\t" + "\t".join([fi[0] for fi in files])
 
 output = [now]
-for (author,path) in files:
-    f = open(path)
+for (author,basepath,texfiles) in files:
     wordCnt = 0
     lineCnt = 0
-    for line in f:
-        #print line.strip()
+    for texfile in texfiles:
+        #sys.stderr.write(texfile+"\n")
+        f = open(basepath + "/" + texfile)
+        for line in f:
+            #print line.strip()
 
-        line = line.decode("utf8").strip()
-        if len(line) == 0:
-            continue
+            try:
+                if author == "y_maki":
+                    line = line.decode("shift-jis").strip()
+                else:
+                    line = line.decode("utf8").strip()
+            except:
+                line = ""
 
-        if line[0] in u"\\%{}[]":
-            #print "OUT!!!"
-            continue #option系は飛ばす
+            if len(line) == 0: 
+               continue
 
-        lineCnt += 1
-        wordCnt += len(line)
-        #print lineCnt,wordCnt
+            #コメントとoptionはカウントしない!
+            if line[0] in u"\\%{}[]":
+                #print "OUT!!!"
+                continue #option系は飛ばす
+
+            lineCnt += 1
+            wordCnt += len(line)
+            #print lineCnt,wordCnt
         
     #print now + "\t" + author + "\t" + str(lineCnt) + "\t" + str(wordCnt)
     output.append(str(wordCnt))
